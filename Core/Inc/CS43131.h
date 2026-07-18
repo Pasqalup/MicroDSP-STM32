@@ -1,0 +1,403 @@
+#pragma once
+#ifndef __CS43131_H
+#define __CS43131_H
+
+#include "DSP.h"
+void CS43131_Init(void);
+void CS43131_WriteRegister(uint32_t regaddr, uint8_t value);
+void CS43131_WriteMultiple(uint32_t regaddr, uint8_t* values, uint8_t length);
+void CS43131_ReadRegister(uint32_t regaddr, uint8_t* value);
+void CS43131_setVolumePercent(uint32_t percent);
+void CS43131_setFilterCoefficients(uint8_t select, const BiquadCoefficients *bq);
+void CS43131_Mute(uint8_t mute);
+
+
+#define CS43131_I2C_ADDRESS 0x60
+
+#define DEVID_A_B 0x10000
+#define DEVID_C_D 0x10001
+#define DEVID_E 0x10002
+#define REV_ID 0x10004
+#define SUBREV_ID 0x10005
+#define SYSCLK_CTRL 0x10006
+#define ASP_SPRATE 0x1000B  
+    #define ASP_SPRATE_44_1KHZ 0b0001
+    #define ASP_SPRATE_48KHZ 0b0010
+    #define ASP_SPRATE_96KHZ 0b0100
+    #define ASP_SPRATE_192KHZ 0b0110
+    #define ASP_SPRATE_384KHZ 0b1000
+#define ASP_SPSIZE 0x1000C
+    #define ASP_SPSIZE_32BIT 0b00
+    #define ASP_SPSIZE_24BIT 0b01
+    #define ASP_SPSIZE_16BIT 0b10
+    #define ASP_SPSIZE_8BIT 0b11
+    #define XSP_SIZE_32BIT 0b0000
+    #define XSP_SIZE_24BIT 0b0100
+#define PAD_INT_CONFIG 0x1000D
+    #define ASP_3ST 0b1
+    #define XSP_3ST 0b10
+#define PDN_CTRL 0x20000
+    #define PDN_CLKOUT 0b1
+    #define PDN_PLL 0b10
+    #define PDN_XTAL 0b100
+    #define PDN_HP 0b1000
+    #define PDN_DSD 0b10000
+    #define PDN_ASP 0b100000
+    #define PDN_XSP 0b1000000
+#define XTAL_SETTINGS 0x20052
+    #define XTAL_IBIAS_15uA 0b010
+    #define XTAL_IBIAS_12_5uA 0b100
+    #define XTAL_IBIAS_7_5uA 0b110
+#define PLL_START 0x30001
+#define PLL_DIV_FRAC_0 0x30002
+#define PLL_DIV_FRAC_1 0x30003
+#define PLL_DIV_FRAC_2 0x30004
+#define PLL_DIV_INT 0x30005
+#define PLL_OUT_DIV 0x30008
+#define PLL_CAL_RATIO 0x3000A
+#define  PLL_MODE_SET 0x3000B
+    #define PLL_BYPASS_500_512 0b10
+#define PLL_REF_PREDIV 0x40002
+    #define PLL_REF_PREDIV_1 0b00
+    #define PLL_REF_PREDIV_2 0b01
+    #define PLL_REF_PREDIV_4 0b10
+    #define PLL_REF_PREDIV_8 0b11
+
+
+#define CLKOUT_CTRL 0x40004
+    #define CLKOUT_SRC_PLL 0b10
+    #define CLKOUT_SRC_XTAL 0b00
+    #define CLKOUT_DIV_2 0b000 << 2
+    #define CLKOUT_DIV_3 0b001 << 2
+    #define CLKOUT_DIV_4 0b010 << 2
+    #define CLKOUT_DIV_8 0b011 << 2
+#define ASP_NUM_1 0x40010
+#define ASP_NUM_2 0x40011
+#define ASP_DEN_1 0x40012
+#define ASP_DEN_2 0x40013
+
+#define ASP_LRCLK_HITIME_1 0x40014
+#define ASP_LRCLK_HITIME_2 0x40015
+#define ASP_LRCLK_PD_1 0x40016
+#define ASP_LRCLK_PD_2 0x40017
+#define ASP_CLKCONF 0x40018
+    #define ASP_LCPOL_IN_INV 0b1
+    #define ASP_LCPOL_OUT_INV 0b10
+    #define ASP_SCPOL_IN_INV 0b100
+    #define ASP_SCPOL_OUT_INV 0b1000
+    #define ASP_MSTR 0b10000
+#define ASP_FRAME_CONF 0x40019
+    #define ASP_FSD_MASK 0b111
+    #define ASP_5050 0b1000
+    #define ASP_STP 0b10000
+#define XSP_NUM_1 0x40020
+#define XSP_NUM_2 0x40021
+#define XSP_DEN_1 0x40022
+#define XSP_DEN_2 0x40023
+#define XSP_LRCLK_HITIME_1 0x40024
+#define XSP_LRCLK_HITIME_2 0x40025
+#define XSP_LRCLK_PD_1 0x40026
+#define XSP_LRCLK_PD_2 0x40027
+#define XSP_CLKCONF 0x40028
+    #define XSP_LCPOL_IN_INV 0b1
+    #define XSP_LCPOL_OUT_INV 0b10
+    #define XSP_SCPOL_IN_INV 0b100
+    #define XSP_SCPOL_OUT_INV 0b1000
+    #define XSP_MSTR 0b10000
+#define XSP_FRAME_CONF 0x40029
+    #define XSP_FSD_MASK 0b111
+    #define XSP_5050 0b1000
+    #define XSP_STP 0b10000
+#define ASP_CH1_LOC 0x50000
+#define ASP_CH2_LOC 0x50001
+#define ASP_CH1_SIZ_EN 0x5000A
+#define ASP_CH2_SIZ_EN 0x5000B
+    #define ASP_CH_RES_8BIT 0b00
+    #define ASP_CH_RES_16BIT 0b01
+    #define ASP_CH_RES_24BIT 0b10
+    #define ASP_CH_RES_32BIT 0b11
+    #define ASP_CH_EN 0b100
+    #define ASP_CH_AP 0b1000
+#define XSP_CH1_LOC 0x60000
+#define XSP_CH2_LOC 0x60001
+#define XSP_CH1_SIZ_EN 0x6000A
+#define XSP_CH2_SIZ_EN 0x6000B
+    #define XSP_CH_RES_8BIT 0b00
+    #define XSP_CH_RES_16BIT 0b01
+    #define XSP_CH_RES_24BIT 0b10
+    #define XSP_CH_RES_32BIT 0b11
+    #define XSP_CH_EN 0b100
+    #define XSP_CH_AP 0b1000
+#define DSD_VOL_B 0x70000
+#define DSD_VOL_A 0x70001
+#define DSD_PROC_PATH_SIG_CTRL 0x70002
+    #define DSD_MUTE_A 0b1
+    #define DSD_MUTE_B 0b10
+    #define DSD_MUTE_AB 0b100
+    #define DSD_AMUTE 0b1000
+    #define DSD_SZC 0b100000
+    #define DSD_VOL_BEQA 0b1000000
+    #define DSD_RAMP_UP 0b10000000
+#define DSD_INT_CONFIG 0x70003
+    #define DSD_PM_SEL 0b1
+    #define DSD_PM_EN 0b10
+    #define DSD_MASTER 0b100
+//I dont wanna finish DSD because im not using it. pls someone  else help me
+//refer to section 7.4.5
+//skipping to headphone & PCM registers.....
+#define HP_OUT_CTRL_1 0x80000
+    #define HP_2V 0b1
+    #define HP_IN_LP 0b100
+    #define HP_IN_EN 0b1000
+    #define OUT_FS_0_5V 0b000000
+    #define OUT_FS_1V 0b010000
+    #define OUT_FS_1_41V 0b100000
+    #define OUT_FS_1_73V 0b110000
+    #define HP_CLAMP_B   0b1000000
+    #define HP_CLAMP_A   0b10000000
+#define PCM_FILT_OPTION 0x90000
+    #define DEEMP_ON 0b1
+    #define HP_FILT_ON 0b10
+    #define PCM_WBF_EN 0b100
+    #define PCM_NOS 0b100000
+    #define PHCOMP_LOWLATB 0b1000000
+    #define FILTER_SLOW 0b10000000
+#define PCM_VOL_B 0x90001
+#define PCM_VOL_A 0x90002
+#define PCM_SIG_CTRL_1 0x90003
+    #define PCM_MUTE_B 0b1
+    #define PCM_MUTE_A 0b10
+    #define PCM_MUTE_AB 0b100
+    #define PCM_AMUTE 0b1000
+    #define PCM_SZC_IMMEDIATE 0b000000
+    #define PCM_SZC_ZRCROSS 0b010000
+    #define PCM_SZC_SOFT_RMP 0b100000
+    #define PCM_SZC_SOFT_RMP_ZRCROSS 0b110000
+    #define PCM_VOL_BEQA 0b1000000
+    #define PCM_RAMP_UP 0b10000000
+#define PCM_SIG_CTRL_2 0x90004
+    #define PCM_COPY_CHAN 0b1
+    #define PCM_SWAP_CHAN 0b10
+    #define PCM_INV_B 0b100
+    #define PCM_INV_A 0b1000
+#define PROG_FILT_CTRL1 0x9000A
+    #define SOS3_ON 0b10
+    #define FOS_CTRL_DISABLED 0b0000
+    #define FOS_CTRL_EN 0b1100
+    #define SOS2_CTRL_DISABLED 0b000000
+    #define SOS2_CTRL_EN 0b110000
+    #define SOS1_CTRL_DISABLED 0b00000000
+    #define SOS1_CTRL_EN 0b11000000
+#define PROG_FILT_CTRL2 0x9000B
+    #define FOS_COEFF_CP 0b10
+    #define SOS2_COEFF_CP 0b100
+    #define SOS1_COEFF_CP 0b1000
+
+#define SOS1_COEFF_B0_LSB 0x9000C
+#define SOS1_COEFF_B0_MSB 0x9000D
+#define SOS1_COEFF_B0_SGN 0x9000E
+#define SOS1_COEFF_B1_LSB 0x9000F
+#define SOS1_COEFF_B1_MSB 0x90010
+#define SOS1_COEFF_B1_SGN 0x90011
+#define SOS1_COEFF_B2_LSB 0x90012
+#define SOS1_COEFF_B2_MSB 0x90013
+#define SOS1_COEFF_B2_SGN 0x90014
+
+#define SOS1_COEFF_A1_LSB 0x90015
+#define SOS1_COEFF_A1_MSB 0x90016
+#define SOS1_COEFF_A1_SGN 0x90017
+#define SOS1_COEFF_A2_LSB 0x90018
+#define SOS1_COEFF_A2_MSB 0x90019
+#define SOS1_COEFF_A2_SGN 0x9001A
+
+#define SOS2_COEFF_B0_LSB 0x9001B
+#define SOS2_COEFF_B0_MSB 0x9001C
+#define SOS2_COEFF_B0_SGN 0x9001D
+#define SOS2_COEFF_B1_LSB 0x9001E
+#define SOS2_COEFF_B1_MSB 0x9001F
+#define SOS2_COEFF_B1_SGN 0x90020
+#define SOS2_COEFF_B2_LSB 0x90021
+#define SOS2_COEFF_B2_MSB 0x90022
+#define SOS2_COEFF_B2_SGN 0x90023
+#define SOS2_COEFF_A1_LSB 0x90024
+#define SOS2_COEFF_A1_MSB 0x90025
+#define SOS2_COEFF_A1_SGN 0x90026
+#define SOS2_COEFF_A2_LSB 0x90027
+#define SOS2_COEFF_A2_MSB 0x90028
+#define SOS2_COEFF_A2_SGN 0x90029
+
+
+#define SOS3_COEFF_B0_LSB 0x9002A
+#define SOS3_COEFF_B0_MSB 0x9002B
+#define SOS3_COEFF_B0_SGN 0x9002C
+#define SOS3_COEFF_B1_LSB 0x9002D
+#define SOS3_COEFF_B1_MSB 0x9002E
+#define SOS3_COEFF_B1_SGN 0x9002F
+#define SOS3_COEFF_B2_LSB 0x90030
+#define SOS3_COEFF_B2_MSB 0x90031
+#define SOS3_COEFF_B2_SGN 0x90032
+#define SOS3_COEFF_A1_LSB 0x90033
+#define SOS3_COEFF_A1_MSB 0x90034
+#define SOS3_COEFF_A1_SGN 0x90035
+#define SOS3_COEFF_A2_LSB 0x90036
+#define SOS3_COEFF_A2_MSB 0x90037
+#define SOS3_COEFF_A2_SGN 0x90038
+
+#define FOS_COEFF_B0_LSB 0x90039
+#define FOS_COEFF_B0_MSB 0x9003A
+#define FOS_COEFF_B0_SGN 0x9003B
+#define FOS_COEFF_B1_LSB 0x9003C
+#define FOS_COEFF_B1_MSB 0x9003D
+#define FOS_COEFF_B1_SGN 0x9003E
+#define FOS_COEFF_A1_LSB 0x9003F
+#define FOS_COEFF_A1_MSB 0x90040
+#define FOS_COEFF_A1_SGN 0x90041
+
+
+/* no clue if these work
+#define SOS_COEFF_B0_LSB(N) (0x9000C + (N) * 0x1B)
+#define SOS_COEFF_B0_MSB(N) (0x9000D + (N) * 0x1B)
+#define SOS_COEFF_B0_SGN(N) (0x9000E + (N   ) * 0x1B)
+#define SOS_COEFF_B1_LSB(N) (0x9000F + (N) * 0x1B)
+#define SOS_COEFF_B1_MSB(N) (0x90010 + (N) * 0x1B)
+#define SOS_COEFF_B1_SGN(N) (0x90011 + (N) * 0x1B)
+#define SOS_COEFF_B2_LSB(N) (0x90012 + (N) * 0x1B)
+#define SOS_COEFF_B2_MSB(N) (0x90013 + (N) * 0x1B)
+#define SOS_COEFF_B2_SGN(N) (0x90014 + (N) * 0x1B)
+#define SOS_COEFF_A1_LSB(N) (0x90015 + (N)  * 0x1B)
+#define SOS_COEFF_A1_MSB(N) (0x90016 + (N)      * 0x1B)
+#define SOS_COEFF_A1_SGN(N) (0x90017 + (N)      * 0x1B)
+#define SOS_COEFF_A2_LSB(N) (0x90018 + (N)      * 0x1B)
+#define SOS_COEFF_A2_MSB(N) (0x90019 + (N)    * 0x1B)   
+
+*/
+
+
+
+
+#define CLASS_H_CTRL 0xB0000
+    #define EXT_VCPFILT 0b1
+    #define HV_EN 0b10
+    #define ADPT_PWR_MODE_0 0b00100
+    #define ADPT_PWR_MODE_1 0b01000
+    #define ADPT_PWR_MODE_ADAPTIVE 0b11100
+#define HP_DETECT_CTRL 0xD0000
+    #define HPDETECT_FALLL_DBC_TIME_0MS 0b00
+    #define HPDETECT_FALLL_DBC_TIME_250MS 0b01
+    #define HPDETECT_FALLL_DBC_TIME_500MS 0b10
+    #define HPDETECT_FALLL_DBC_TIME_1000MS 0b11
+    #define HPDETECT_RISE_DBC_TIME_0MS 0b0000
+    #define HPDETECT_RISE_DBC_TIME_250MS 0b0100
+    #define HPDETECT_RISE_DBC_TIME_500MS 0b1000
+    #define HPDETECT_RISE_DBC_TIME_1000MS 0b1100
+    #define HPDETECT_INV 0b10000
+    #define HPDETECT_CTRL 0b11000000
+#define HP_STATUS 0xD0001
+    #define HPDETECT_UNPLUG_DBC 0b100000
+    #define HPDETECT_PLUG_DBC 0b1000000
+
+#define HP_LOAD_1 0xE0000
+    #define HPLOAD_EN 0b10000000
+    #define HPLOAD_CHN_SEL_HPOUTA 0b00000000
+    #define HPLOAD_CHN_SEL_HPOUTB 0b00010000
+    #define HPLOAD_AC_START 0b00000010
+    #define HPLOAD_DC_START 0b00000001
+#define HP_LOAD_MEAS_1 0xE0003
+#define HP_LOAD_MEAS_2 0xE0004
+#define HP_DC_LOAD_STAT_0 0xE000D
+#define HP_DC_LOAD_STAT_1 0xE000E
+#define HP_AC_LOAD_STAT_0 0xE0010
+#define HP_AC_LOAD_STAT_1 0xE0011
+#define HP_LOAD_STAT 0xE001A
+    #define HPLOAD_DC_ONCE 0b10000000
+    #define HPLOAD_BUSY 0b01000000
+    #define HPLOAD_AC_DONE 0b00100000
+    #define HPLOAD_AC_BUSY 0b00010000
+    #define HPLOAD_DC_DONE 0b00001000
+    #define HPLOAD_DC_BUSY 0b00000100
+
+#define INT_STAT_1 0xF0000
+    #define DAC_OVFL_INT 0b10000000
+    #define HPDETECT_PLUG_INT 0b01000000
+    #define HPDETECT_UNPLUG_INT 0b00100000
+    #define XTAL_READY_INT 0b00010000
+    #define XTAL_ERROR_INT 0b00001000
+    #define PLL_READY_INT 0b00000100
+    #define PLL_ERROR_INT 0b00000010
+    #define PDN_DONE_INT 0b00000001
+#define INT_STAT_2 0xF0001
+    #define ASP_OVFL_INT 0b10000000
+    #define ASP_ERROR_INT 0b01000000
+    #define ASP_LATE_INT 0b00100000
+    #define ASP_EARLY_INT 0b00010000
+    #define ASP_NOLRCK_INT 0b00001000
+#define INT_STAT_3 0xF0002
+    #define XSP_OVFL_INT 0b10000000
+    #define XSP_ERROR_INT 0b01000000
+    #define XSP_LATE_INT 0b00100000
+    #define XSP_EARLY_INT 0b00010000
+    #define XSP_NOLRCK_INT 0b00001000
+#define INT_STAT_4 0xF0003
+    #define HPLOAD_NO_DC_INT 0b10000000
+    #define HPLOAD_UNPLUG_INT 0b01000000
+    #define HPLOAD_HPOUT_INT 0b00100000
+    #define HPLOAD_OOR_INT 0b00010000
+    #define HPLOAD_AC_DONE_INT 0b00001000
+    #define HPLOAD_DC_DONE_INT 0b00000100
+    #define HPLOAD_OFF_INT 0b00000010
+    #define HPLOAD_ON_INT 0b00000001
+#define INST_STAT_5 0xF0004
+    #define DSD_STUCK_INT 0b10000000
+    #define DSD_INVAL_A_INT 0b01000000
+    #define DSD_INVAL_B_INT 0b00100000
+    #define DSD_SILENCE_A_INT 0b00010000
+    #define DSD_SILENCE_B_INT 0b00001000
+    #define DSD_RATE_ERROR_INT 0b00000100
+    #define DOP_MRK_DET_INT 0b00000010
+    #define DOP_ON_INT 0b00000001
+#define INT_MASK_1 0xF0010
+    #define DAC_OVFL_INT_MASK 0b10000000
+    #define HPDETECT_PLUG_INT_MASK 0b01000000
+    #define HPDETECT_UNPLUG_INT_MASK 0b00100000
+    #define XTAL_READY_INT_MASK 0b00010000
+    #define XTAL_ERROR_INT_MASK 0b00001000
+    #define PLL_READY_INT_MASK 0b00000100
+    #define PLL_ERROR_INT_MASK 0b00000010
+    #define PDN_DONE_INT_MASK 0b00000001
+#define INT_MASK_2 0xF0011
+    #define ASP_OVFL_INT_MASK 0b10000000
+    #define ASP_ERROR_INT_MASK 0b01000000
+    #define ASP_LATE_INT_MASK 0b00100000
+    #define ASP_EARLY_INT_MASK 0b00010000
+    #define ASP_NOLRCK_INT_MASK 0b00001000
+#define INT_MASK_3 0xF0012
+    #define XSP_OVFL_INT_MASK 0b10000000
+    #define XSP_ERROR_INT_MASK 0b01000000
+    #define XSP_LATE_INT_MASK 0b00100000
+    #define XSP_EARLY_INT_MASK 0b00010000
+    #define XSP_NOLRCK_INT_MASK 0b00001000
+#define INT_MASK_4 0xF0013
+    #define HPLOAD_NO_DC_INT_MASK 0b10000000
+    #define HPLOAD_UNPLUG_INT_MASK 0b01000000
+    #define HPLOAD_HPOUT_INT_MASK 0b00100000
+    #define HPLOAD_OOR_INT_MASK 0b00010000
+    #define HPLOAD_AC_DONE_INT_MASK 0b00001000
+    #define HPLOAD_DC_DONE_INT_MASK 0b00000100
+    #define HPLOAD_OFF_INT_MASK 0b00000010
+    #define HPLOAD_ON_INT_MASK 0b00000001
+#define INT_MASK_5 0xF0014
+    #define DSD_STUCK_INT_MASK 0b10000000
+    #define DSD_INVAL_A_INT_MASK 0b01000000
+    #define DSD_INVAL_B_INT_MASK 0b00100000
+    #define DSD_SILENCE_A_INT_MASK 0b00010000
+    #define DSD_SILENCE_B_INT_MASK 0b00001000
+    #define DSD_RATE_ERROR_INT_MASK 0b00000100
+    #define DOP_MRK_DET_INT_MASK 0b00000010
+    #define DOP_ON_INT_MASK 0b00000001
+#define ASP_SLEW_RATE_CTRL 0xF0020
+    #define SCLK1_SLEW_RATE_12_288MHZ 0b10
+    #define SCLK1_SLEW_RATE_HIGHER 0b01
+#define XSP_SLEW_RATE_CTRL 0xF0021
+    #define DSDCLK_SCLK2_SLEW_RATE_12_288MHZ 0b10
+    #define DSDCLK_SCLK2_SLEW_RATE_HIGHER 0b01
+#endif

@@ -23,6 +23,7 @@
 
 /* USER CODE BEGIN INCLUDE */
 #include "i2s.h"
+#include "CS43131.h"
 
 /* USER CODE END INCLUDE */
 
@@ -50,11 +51,6 @@
   */
 
 /* USER CODE BEGIN PRIVATE_TYPES */
-typedef struct{
-  int32_t b0,b1,b2;
-  int32_t a1,a2;
-  int32_t s1,s2;
-} BiquadFilter;
 
 /* USER CODE END PRIVATE_TYPES */
 
@@ -68,6 +64,7 @@ typedef struct{
   */
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
+
 
 /* USER CODE END PRIVATE_DEFINES */
 
@@ -160,6 +157,12 @@ USBD_AUDIO_ItfTypeDef USBD_AUDIO_fops_FS =
 static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t options)
 {
   /* USER CODE BEGIN 0 */
+  CS43131_setVolumePercent(Volume);
+  if(AudioFreq != I2S_AUDIOFREQ_48K)  
+  {
+    return (USBD_FAIL);
+  }
+  HAL_I2S_Init(&hi2s1);
   return (USBD_OK);
   /* USER CODE END 0 */
 }
@@ -172,6 +175,8 @@ static int8_t AUDIO_Init_FS(uint32_t AudioFreq, uint32_t Volume, uint32_t option
 static int8_t AUDIO_DeInit_FS(uint32_t options)
 {
   /* USER CODE BEGIN 1 */
+  HAL_I2S_DMAStop(&hi2s1);
+  HAL_I2S_DeInit(&hi2s1);
   return (USBD_OK);
   /* USER CODE END 1 */
 }
@@ -190,9 +195,11 @@ static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
   {
     case AUDIO_CMD_START:
     // Start playing audio stream
+      HAL_I2S_Transmit_DMA(&hi2s1, (uint16_t*)pbuf, size);
     break;
 
     case AUDIO_CMD_PLAY:
+      HAL_I2S_Transmit_DMA(&hi2s1, (uint16_t*)pbuf, size);
 
     // Continue playing audio stream
     // set i2s DMA address to pbuf
@@ -212,6 +219,7 @@ static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
 static int8_t AUDIO_VolumeCtl_FS(uint8_t vol)
 {
   /* USER CODE BEGIN 3 */
+  CS43131_setVolumePercent(vol);
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -224,6 +232,7 @@ static int8_t AUDIO_VolumeCtl_FS(uint8_t vol)
 static int8_t AUDIO_MuteCtl_FS(uint8_t cmd)
 {
   /* USER CODE BEGIN 4 */
+  CS43131_Mute(1);
   return (USBD_OK);
   /* USER CODE END 4 */
 }

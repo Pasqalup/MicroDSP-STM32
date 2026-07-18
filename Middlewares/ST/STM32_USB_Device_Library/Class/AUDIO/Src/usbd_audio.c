@@ -152,7 +152,7 @@ USBD_ClassTypeDef  USBD_AUDIO =
 };
 
 /* USB AUDIO device Configuration Descriptor */
-__ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALIGN_END =
+__ALIGN_BEGIN static const uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALIGN_END =
 {
   /* Configuration 1 */
   0x09,                                 /* bLength */
@@ -198,7 +198,7 @@ __ALIGN_BEGIN static uint8_t USBD_AUDIO_CfgDesc[USB_AUDIO_CONFIG_DESC_SIZ] __ALI
   0x01,                                 /* wTerminalType AUDIO_TERMINAL_USB_STREAMING   0x0101 */
   0x01,
   0x00,                                 /* bAssocTerminal */
-  0x01,                                 /* bNrChannels */
+  0x02,                                 /* bNrChannels */
   0x00,                                 /* wChannelConfig 0x0000  Mono */
   0x00,
   0x00,                                 /* iChannelNames */

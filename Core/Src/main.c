@@ -23,6 +23,8 @@
 #include "i2s.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "CS43131.h"
+#include "DSP.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -47,6 +49,36 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+// store 2 biquad filters and states for left and right channels (coefficients + state)
+
+//store 3 biquad filters to be sent to the CS43131 (no states/seperate)
+// store 2 biquad coefficients and states for left and right channels
+static const BiquadCoefficients filtersL_coeffs[2] = {
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000}, // Biquad coeffs 1
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000}  // Biquad coeffs 2
+};
+
+static BiquadFilter filtersL[2] = {
+  { &filtersL_coeffs[0], {0,0} },
+  { &filtersL_coeffs[1], {0,0} }
+};
+
+static const BiquadCoefficients filtersR_coeffs[2] = {
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000}, // Biquad coeffs 1
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000}  // Biquad coeffs 2
+};
+
+static BiquadFilter filtersR[2] = {
+  { &filtersR_coeffs[0], {0,0} },
+  { &filtersR_coeffs[1], {0,0} }
+};
+
+// store 3 biquad coefficients to be sent to the CS43131 (no states/separate)
+static const BiquadCoefficients cs43131_filters[3] = {
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000}, // Biquad coeffs 1
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000}, // Biquad coeffs 2
+  {0x20000000, 0x40000000, 0x20000000, 0x00000000, 0x00000000} // Biquad coeffs 3
+};
 
 /* USER CODE END PV */
 
@@ -96,6 +128,25 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
+  CS43131_Init();
+
+  
+  int32_t result = biquad_process(&filtersL[0], 2);
+  result = biquad_process(&filtersL[1], result);
+  int32_t resultR = biquad_process(&filtersR[0], 2);
+  resultR = biquad_process(&filtersR[1], resultR);
+
+
+  CS43131_setFilterCoefficients(1, &cs43131_filters[0]);
+  CS43131_setFilterCoefficients(2, &cs43131_filters[1]);
+  CS43131_setFilterCoefficients(3, &cs43131_filters[2]);
+  /*
+  CS43131:
+  ASP_SPRATE = ASP_SPRATE_48KHZ // set sample rate to 48kHz
+  ASP_SPSIZE = ASP_SPSIZE_16BIT // set sample size to 16 bits
+  PDN_CTRL &= ~(PDN_ASP | PDN_XTAL | PDN_HP) // power up ASP, XTAL, and HP
+  
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,7 +156,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    
 
     
   }
