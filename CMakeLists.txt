@@ -66,3 +66,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
     # Add user defined libraries
 )
+# Size optimization
+add_compile_options(-Os -ffunction-sections -fdata-sections)
+
+# Link-time dead code elimination + size report
+add_link_options(-Wl,--gc-sections -Wl,--print-memory-usage)

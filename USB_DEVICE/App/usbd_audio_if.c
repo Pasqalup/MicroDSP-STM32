@@ -22,6 +22,7 @@
 #include "usbd_audio_if.h"
 
 /* USER CODE BEGIN INCLUDE */
+#include "i2s.h"
 
 /* USER CODE END INCLUDE */
 
@@ -49,6 +50,11 @@
   */
 
 /* USER CODE BEGIN PRIVATE_TYPES */
+typedef struct{
+  int32_t b0,b1,b2;
+  int32_t a1,a2;
+  int32_t s1,s2;
+} BiquadFilter;
 
 /* USER CODE END PRIVATE_TYPES */
 
@@ -88,6 +94,7 @@
   */
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
+
 
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -182,9 +189,15 @@ static int8_t AUDIO_AudioCmd_FS(uint8_t* pbuf, uint32_t size, uint8_t cmd)
   switch(cmd)
   {
     case AUDIO_CMD_START:
+    // Start playing audio stream
     break;
 
     case AUDIO_CMD_PLAY:
+
+    // Continue playing audio stream
+    // set i2s DMA address to pbuf
+    // set i2s DMA counter to size / 4
+    // start i2s DMA
     break;
   }
   return (USBD_OK);
@@ -261,6 +274,18 @@ void HalfTransfer_CallBack_FS(void)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s){
+  if(hi2s == &hi2s1){
+    TransferComplete_CallBack_FS();
+  }
+}
+
+
+void HAL_I2S_TxHalfCpltCallback(I2S_HandleTypeDef *hi2s){
+  if(hi2s == &hi2s1){
+    HalfTransfer_CallBack_FS();
+  }
+}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
